@@ -1,0 +1,15 @@
+{
+  "name": "api_mspr",
+  "version": "1.0.0",
+  "description": "api for mspr project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ESPI student",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongo": "^0.1.0"
+  }
+}
