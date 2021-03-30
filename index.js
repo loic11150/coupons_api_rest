@@ -17,16 +17,20 @@ async function asyncCall () {
 
     //add coupon ressource : JSON
     app.post('/coupons', async  (req, res) => {
-        id = parseInt(req.body._id);
-        let idPromise = isExist(id);
-        idPromise.then(async function(result) {
-            if (result){
-                res.status(400).json("erreur l'id existe déjà");
-            }else{
+        lastid = await coupons.count();
+        lastid = parseInt(lastid)+1;
+        req.body._id = lastid;
+        if ("libelle" in req.body&& "discount" in req.body && "deadline" in req.body){
+            try{
                 await coupons.insertOne(req.body);
-                res.status(201).json(req.body);
+                res.status(201).json(req.body); 
+            }catch(error){
+                console.log(error);
+                res.status(400); 
             }
-        })
+        }else{
+            res.status(400).json("erreur: manque du contenu dans le JSON"); 
+        }  
     })
 
     //find 1 coupon
@@ -35,8 +39,13 @@ async function asyncCall () {
         let idPromise = isExist(id);
         idPromise.then(async function(result) {
             if (result){
-                coupon = await coupons.findOne({"_id":id});
-                res.status(200).json(coupon);
+                try {
+                    coupon = await coupons.findOne({"_id":id});
+                    res.status(200).json(coupon);
+                }catch(error){
+                    console.log(error);
+                    res.status(400);
+                }
             }else{
                 res.status(404).json("erreur l'id n'existe pas");
             }
@@ -45,9 +54,20 @@ async function asyncCall () {
 
     //find all coupons
     app.get('/coupons', async  (req, res) => {
-        coupon = await coupons.find({}).toArray();
-        res.status(200).json(coupon);
+        try {
+            coupon = await coupons.find({}).toArray();
+            res.status(200).json(coupon);
+        }catch(error){
+            console.log(error);
+            res.status(400);
+        }
     })
+
+    //count coupons
+    // app.get('/stats/nb', async  (req, res) => {
+    //     nbcoupons = await coupons.count({});
+    //     res.status(200).json(nbcoupons);
+    // })
 
     //delete coupon
     app.delete('/coupons/:id', async (req, res) =>{
@@ -55,8 +75,35 @@ async function asyncCall () {
         let idPromise = isExist(id);
         idPromise.then(async function(result) {
             if (result){
-                await coupons.deleteOne({"_id":id});
-                res.status(201).json();
+                try {
+                    await coupons.deleteOne({"_id":id});
+                    res.status(201).json();
+                }catch(error){
+                    console.log(error);
+                    res.status(400);
+                }
+            }else{
+                res.status(400).json("erreur l'id n'existe pas");
+            }
+        })
+    })
+
+    //modifie coupon
+    app.patch('/coupons/:id', async (req, res) =>{
+        id = parseInt(req.params.id);
+        let idPromise = isExist(id);
+        idPromise.then(async function(result) {
+            if (result){
+                // bodycontent = req.body;
+                try{
+                    await coupons.updateOne({"_id":id},{$set:req.body});
+                    xxx = await coupons.findOne({"_id":id});
+                    res.status(200).json(xxx);
+                }
+                catch(error){
+                    console.log(error);
+                    res.status(400);
+                }
             }else{
                 res.status(400).json("erreur l'id n'existe pas");
             }
@@ -75,4 +122,3 @@ async function asyncCall () {
     }
 }
 asyncCall();
-
