@@ -63,12 +63,6 @@ async function asyncCall () {
         }
     })
 
-    //count coupons
-    // app.get('/stats/nb', async  (req, res) => {
-    //     nbcoupons = await coupons.count({});
-    //     res.status(200).json(nbcoupons);
-    // })
-
     //delete coupon
     app.delete('/coupons/:id', async (req, res) =>{
         id = parseInt(req.params.id);
@@ -77,13 +71,13 @@ async function asyncCall () {
             if (result){
                 try {
                     await coupons.deleteOne({"_id":id});
-                    res.status(201).json();
+                    res.status(204).json();
                 }catch(error){
                     console.log(error);
                     res.status(400);
                 }
             }else{
-                res.status(400).json("erreur l'id n'existe pas");
+                res.status(404).json("erreur l'id n'existe pas");
             }
         })
     })
